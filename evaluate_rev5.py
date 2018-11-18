@@ -2,7 +2,9 @@ import numpy as np
 import pickle
 import csv
 import datetime
+import datetime
 import matplotlib.pyplot as plt
+
 
 def load_pickle(path):
     with open(path, "rb") as f:
@@ -33,12 +35,12 @@ def main():
     data = []
 
     # 登録済みデータ
-    old = np.array(load_pickle("sample5_true.pickle"))
+    old = np.array(load_pickle("sample_updown_10.pickle"))
     # old = np.array([[1,1],[1,1]])#[2,2],[4,4]
     #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
 
     # 認証データ
-    new = np.array(load_pickle("sample10_other.pickle"))
+    new = np.array(load_pickle("sample_updown_19.pickle"))
     # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
     #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
 
@@ -61,7 +63,7 @@ def main():
 
     n = np.argmin(data)
     print(n)
-
+    
     # 認証処理(時系列をそろえた結果を用いてそれぞれの特徴点ごとに距離を比較)
     auth = []
     for k in range(0, len(min)):
@@ -73,9 +75,17 @@ def main():
     max_value_of_auth = auth.max()
     auth /= max_value_of_auth
 
+    #オプティカルフローを数値で表現
+    data_norm = []
+    dist_norm = 0
+    for no in range(0, len(old)):
+        data_norm.append(np.linalg.norm(old[no], axis = 1))  # ベクトル間の距離
+        
+    print(data_norm[0])
+
     # ベクトルの可視化
     visualize_vec(old)
-
+    #visualize_vec(new)
     # 認証結果の1フレーム目の結果表示
     print(auth[0])
 
@@ -83,6 +93,7 @@ def main():
     save_as_csv('outputs/output_true', auth)
     save_as_csv('outputs/vec_true', old)
     save_as_csv('outputs/vec_challenge', new)
+    save_as_csv('outputs/old_norm',data_norm)
 
 
 if __name__ == "__main__":
