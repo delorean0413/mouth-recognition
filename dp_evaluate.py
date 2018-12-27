@@ -141,7 +141,7 @@ def main():
     i = LengthA-1
     j = LengthB-1
 
-    for k in reversed(range(LenAB,i >= 0 && j>= 0)) #for(k = LenAB; i >= 0 && j >= 0; k--)
+    for k in range(LenAB,0,-1) #for(k = LenAB; i >= 0 && j >= 0; k--)
         ResultA[k] = max[i]
         ResultB[k] = min[j]
 
@@ -154,10 +154,40 @@ def main():
             j--
         else:
             print("Error")
-        
+        if(i>=0 && j >= 0):
+            break
     LenAB -= k
 
-    for
+    for i in range(0,LenAB)
+        ResultA[i] = ResultA[i+k+1]
+        ResultB[i] = ResultB[i+k+1]
+
+    ResultA[LenAB] = ResultB[LenAB] = '\0'
+
+    print("===Matching Result===")
+    print("Difference = %6.1f\n",Distance)
+
+    for i in range(0,LengthA)
+        print("%3d:",i+1)
+        for j in range(0,LengthB)
+            print("%1d",From[i][j])
+            
+            if(From[i][j] == 0):
+                print("\\")
+                break
+            else if(From[i][j] == 1):
+                print("|")
+                break
+            else if(From[i][j] == 2):
+                print("-")
+                break
+            else:
+                break
+
+    print("\n")
+    print("A: %s",ResultA)
+    print("B: %s",ResultB)
+    
     #DP
 
 
