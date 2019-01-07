@@ -94,11 +94,11 @@ def main():
     for i in range(0,LengthA):
         print(i+1)
         for j in range(0,LengthB):
-            if(max[i] == min[j]):
+            if(max[i] is min[j]): #==
                 MissMatch[i][j] = 0
                 print("o")
             else:
-                MissMatch[i][j] = 0
+                MissMatch[i][j] = 1
                 print(".")
 
     print("\n")
