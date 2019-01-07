@@ -124,10 +124,10 @@ def main():
             dtemp2 = Cost[i-1][j] + MissMatch[i][j] * AwazuPenalty + ZurePenalty
             dtemp3 = Cost[i][j-1] + MissMatch[i][j] * AwazuPenalty + ZurePenalty
 
-            if(dtemp1<=dtemp2 && dtemp1<= dtemp3):
+            if(dtemp1 <= dtemp2 and dtemp1<= dtemp3):
                 Cost[i][j] = dtemp1
                 From[i][j] = 0
-            else if(dtemp2<= dtemp3):
+            elif (dtemp2<= dtemp3):
                 Cost[i][j] = dtemp2
                 From[i][j] = 1
             else:
@@ -141,24 +141,24 @@ def main():
     i = LengthA-1
     j = LengthB-1
 
-    for k in range(LenAB,0,-1) #for(k = LenAB; i >= 0 && j >= 0; k--)
+    for k in range(LenAB,0,-1): #for(k = LenAB; i >= 0 && j >= 0; k--)
         ResultA[k] = max[i]
         ResultB[k] = min[j]
 
         if(From[i][j] == 0):
-            i--
-            j--
-        else if(From[i][j] == 1):
-            i--
-        else if(From[i][j] == 2):
-            j--
+            i-=1
+            j-=1
+        elif(From[i][j] == 1):
+            i-=1
+        elif(From[i][j] == 2):
+            j-=1
         else:
             print("Error")
-        if(i>=0 && j >= 0):
+        if(i>=0 and j >= 0):
             break
     LenAB -= k
 
-    for i in range(0,LenAB)
+    for i in range(0,LenAB):
         ResultA[i] = ResultA[i+k+1]
         ResultB[i] = ResultB[i+k+1]
 
@@ -167,18 +167,18 @@ def main():
     print("===Matching Result===")
     print("Difference = %6.1f\n",Distance)
 
-    for i in range(0,LengthA)
+    for i in range(0,LengthA):
         print("%3d:",i+1)
-        for j in range(0,LengthB)
+        for j in range(0,LengthB):
             print("%1d",From[i][j])
             
             if(From[i][j] == 0):
                 print("\\")
                 break
-            else if(From[i][j] == 1):
+            elif(From[i][j] == 1):
                 print("|")
                 break
-            else if(From[i][j] == 2):
+            elif(From[i][j] == 2):
                 print("-")
                 break
             else:
