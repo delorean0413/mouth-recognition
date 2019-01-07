@@ -30,22 +30,18 @@ def visualize_vec(data):
 
 
 def main():
-    data = []
+    #data = []
     ZurePenalty = 1 #1文字ずれたことへのペナルティ
     AwazuPenalty = 5 #1文字不一致へのペナルティ
     Distance = 0 #2つの文字列の不一致度
     LengthA = 0 #Aの長さ
     LengthB = 0 #Bの長さ
 
-    MissMatch = [[]] #一致結果バッファ
-    Cost = [[]] #各経路点の到達コスト
-    From = [[]] #最短距離経路はどこから来たか 0:斜め 1:i増え 2:j増え
     dtemp1 = 0 
     dtemp2 = 0 
     dtemp3 = 0
 
-    ResultA = []
-    ResultB = []
+    
     
     LenAB = 0
     
@@ -89,20 +85,33 @@ def main():
 
     LengthA = len(max)
     LengthB = len(min)
-
+    print(LengthA)
+    print(LengthB)
+    MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #一致結果バッファ  int MissMatch[64][64];
+    print(len(MissMatch))
+    #print(MissMatch)
     #総当たりで一致の確認
-    for i in range(0,LengthA):
-        print(i+1)
-        for j in range(0,LengthB):
-            if(max[i] is min[j]): #==
+    for i,mA in enumerate(max): #range(0,LengthA)  for(i = 0; i < LengthA; i++)
+        #print(i+1)
+        print('i', i)    
+        
+        for j,mI in enumerate(min):   #for(j = 0; j < LengthB; j++) 
+            #print('j', j)
+
+            if(mA is mI): #==
                 MissMatch[i][j] = 0
-                print("o")
+                #print("o")
             else:
                 MissMatch[i][j] = 1
-                print(".")
+                #print(".")
+                
+            
+            
 
     print("\n")
 
+    Cost = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #各経路点の到達コスト double Cost[64][64];
+    From = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #最短距離経路はどこから来たか 0:斜め 1:i増え 2:j増え int From[64][64];
     #コスト計算
     Cost[0][0] = MissMatch[0][0] * AwazuPenalty
     From[0][0] = 0
@@ -138,23 +147,26 @@ def main():
 
     #ゴールからスタートへ逆にたどる
     LenAB = LengthA + LengthB
-    i = LengthA-1
-    j = LengthB-1
+    s = LengthA-1
+    g = LengthB-1
+
+    ResultA = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #char ResultA[128];
+    ResultB = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #char ResultB[128];
 
     for k in range(LenAB,0,-1): #for(k = LenAB; i >= 0 && j >= 0; k--)
-        ResultA[k] = max[i]
-        ResultB[k] = min[j]
+        ResultA[k] = max[s]
+        ResultB[k] = min[g]
 
-        if(From[i][j] == 0):
-            i-=1
-            j-=1
-        elif(From[i][j] == 1):
-            i-=1
-        elif(From[i][j] == 2):
-            j-=1
+        if(From[s][g] == 0):
+            s-=1
+            g-=1
+        elif(From[s][g] == 1):
+            s-=1
+        elif(From[s][g] == 2):
+            g-=1
         else:
             print("Error")
-        if(i>=0 and j >= 0):
+        if(s >= 0 and g >= 0):
             break
     LenAB -= k
 
