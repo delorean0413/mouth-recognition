@@ -4,6 +4,7 @@ import csv
 import datetime
 import matplotlib.pyplot as plt
 
+
 def load_pickle(path):
     with open(path, "rb") as f:
         return pickle.load(f)
@@ -21,7 +22,8 @@ def visualize_vec(data):
     plt.figure()
     for i, frame in enumerate(data):
         for j, point in enumerate(frame):
-            plt.quiver(i, j, point[0], point[1], angles='xy', scale=2.0, scale_units='xy', linewidth=.5)
+            plt.quiver(i, j, point[0], point[1], angles='xy',
+                       scale=2.0, scale_units='xy', linewidth=.5)
     plt.xlabel('frame')
     plt.ylabel('index of feature point')
     plt.grid()
@@ -31,28 +33,25 @@ def visualize_vec(data):
 
 def main():
     #data = []
-    ZurePenalty = 1 #1文字ずれたことへのペナルティ
-    AwazuPenalty = 3 #1文字不一致へのペナルティ
-    Distance = 0 #2つの文字列の不一致度
-    LengthA = 0 #Aの長さ
-    LengthB = 0 #Bの長さ
+    ZurePenalty = 1  # 1文字ずれたことへのペナルティ
+    AwazuPenalty = 1  # 1文字不一致へのペナルティ
+    Distance = 0  # 2つの文字列の不一致度
+    LengthA = 0  # Aの長さ
+    LengthB = 0  # Bの長さ
 
-    dtemp1 = 0 
-    dtemp2 = 0 
+    dtemp1 = 0
+    dtemp2 = 0
     dtemp3 = 0
 
-    
-    
     LenAB = 0
-    
 
     # 登録済みデータ
-    old = np.array(load_pickle("sample5_true.pickle"))
+    old = np.array(load_pickle("sample_updown_1.pickle"))
     # old = np.array([[1,1],[1,1]])#[2,2],[4,4]
     #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
 
     # 認証データ
-    new = np.array(load_pickle("sample10_other.pickle"))
+    new = np.array(load_pickle("sample_updown_1.pickle"))
     # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
     #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
 
@@ -61,7 +60,6 @@ def main():
     print("new.shape", new.shape)
     assert old.ndim == new.ndim, "登録データと認証対象データの次元が異なる"
 
-    
     if len(old) > len(new):
         max, min = old, new
     else:
@@ -79,132 +77,132 @@ def main():
     print(n)
     """
 
-    #DPマッチング
-    print("Input StringA",max)
-    print("Input StringB",min)
+    # DPマッチング
+    print("Input StringA", max)
+    print("Input StringB", min)
 
     LengthA = len(max)
     LengthB = len(min)
     print(LengthA)
     print(LengthB)
-    MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #一致結果バッファ  int MissMatch[64][64];
+    # 一致結果バッファ  int MissMatch[64][64];
+    MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)]
     print(len(MissMatch))
-    #print(MissMatch)
-    #総当たりで一致の確認
-    for i,mA in enumerate(max): #range(0,LengthA)  for(i = 0; i < LengthA; i++)
-        #print(i+1)
-        #print('i', i)    
-        
-        for j,mI in enumerate(min):   #for(j = 0; j < LengthB; j++) 
-            #print('j', j)
+    # print(MissMatch)
 
-            if(mA is mI): #==
+    # 総当たりで一致の確認
+    for i, mA in enumerate(max):  # range(0,LengthA)  for(i = 0; i < LengthA; i++)
+        # print(i+1)
+        #print('i', i)
+        for j, mI in enumerate(min):  # for(j = 0; j < LengthB; j++)
+            #print('j', j)
+            diff = np.linalg.norm(mA-mI) # 距離の定義
+            MissMatch[i][j] = diff
+
+            """
+            if(mA == mI):
                 MissMatch[i][j] = 0
-                #print("o")
             else:
                 MissMatch[i][j] = 1
-                #print(".")
-                
-            
-            
+            """
 
     print("\n")
 
-    Cost = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #各経路点の到達コスト double Cost[64][64];
-    From = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #最短距離経路はどこから来たか 0:斜め 1:i増え 2:j増え int From[64][64];
-    #コスト計算
+    # 各経路点の到達コスト
+    Cost = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)]
+    # 最短距離経路はどこから来たか 0:斜め 1:i増え 2:j増え
+    From = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)]
+    # コスト計算
     Cost[0][0] = MissMatch[0][0] * AwazuPenalty
     From[0][0] = 0
 
-    #i側の縁
-    for i in range(1,LengthA):
-        Cost[i][0] = Cost[i-1][0] + ZurePenalty + MissMatch[i][0] * AwazuPenalty
+    # i側の縁
+    for i in range(1, LengthA):
+        Cost[i][0] = Cost[i-1][0] + ZurePenalty + \
+            MissMatch[i][0] * AwazuPenalty
         From[i][0] = 1
-    
-    #j側の縁
-    for j in range(1,LengthB):
-        Cost[0][j] = Cost[0][j-1] + ZurePenalty + MissMatch[0][j] * AwazuPenalty
+
+    # j側の縁
+    for j in range(1, LengthB):
+        Cost[0][j] = Cost[0][j-1] + ZurePenalty + \
+            MissMatch[0][j] * AwazuPenalty
         From[0][j] = 2
 
-    #中間部
-    for i in range(1,LengthA):
-        for j in range(1,LengthB):
-            dtemp1 = Cost[i-1][j-1] + MissMatch[i][j] * AwazuPenalty
+    # 中間部
+    for i in range(1, LengthA):
+        for j in range(1, LengthB):
+            # 斜めで来た場合のコスト
+            dtemp1 = Cost[i-1][j-1] + MissMatch[i][j] * AwazuPenalty  
+            # i増えで来た場合のコスト 
             dtemp2 = Cost[i-1][j] + MissMatch[i][j] * AwazuPenalty + ZurePenalty
+            # j増えで来た場合のコスト 
             dtemp3 = Cost[i][j-1] + MissMatch[i][j] * AwazuPenalty + ZurePenalty
 
-            if(dtemp1 <= dtemp2 and dtemp1<= dtemp3):
+            #print(i, ": ", dtemp1, dtemp2, dtemp3)
+
+            if(dtemp1 <= dtemp2 and dtemp1 <= dtemp3):
                 Cost[i][j] = dtemp1
                 From[i][j] = 0
-            elif (dtemp2<= dtemp3):
+            elif (dtemp2 <= dtemp3):
                 Cost[i][j] = dtemp2
                 From[i][j] = 1
             else:
                 Cost[i][j] = dtemp3
                 From[i][j] = 2
 
-    Distance = Cost[LengthA-1][LengthB-1] #DPマッチングの不一致度はこれ。以降は結果観察のための整形手続き
+    Distance = Cost[LengthA-1][LengthB-1]  # DPマッチングの不一致度はこれ。以降は結果観察のための整形手続き
 
-    #ゴールからスタートへ逆にたどる
+    # ゴールからスタートへ逆にたどる
     LenAB = LengthA + LengthB
     s = LengthA-1
     g = LengthB-1
-    #print(LenAB)
-    #print(s)
-    #print(g)
-    ResultA = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #char ResultA[128];
-    ResultB = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #char ResultB[128];
-    
 
-    for k in range(LenAB,0,-1): #for(k = LenAB; i >= 0 && j >= 0; k--)
-        ResultA.append(max[s]) #ResultA[k] = max[s]
-        ResultB.append(min[g]) #ResultB[k] = min[s]
+    ResultA = [[0 for i in range(LengthB+1)]
+               for j in range(LengthA+1)]
+    ResultB = [[0 for i in range(LengthB+1)]
+               for j in range(LengthA+1)]
+
+    for k in range(LenAB, 0, -1):  
+        ResultA.append(max[s])  # ResultA[k] = max[s]
+        ResultB.append(min[g])  # ResultB[k] = min[s]
 
         if(From[s][g] == 0):
-            s-=1
-            g-=1
+            s -= 1
+            g -= 1
         elif(From[s][g] == 1):
-            s-=1
+            s -= 1
         elif(From[s][g] == 2):
-            g-=1
+            g -= 1
         else:
             print("Error")
         if(s >= 0 and g >= 0):
             break
     LenAB -= k
 
-    for i in range(0,LenAB):
+    for i in range(0, LenAB):
         ResultA[i] = ResultA[i+k+1]
         ResultB[i] = ResultB[i+k+1]
 
     ResultA[LenAB] = ResultB[LenAB] = '\0'
 
     print("===Matching Result===")
-    print("Difference = ",Distance)
+    print("Difference = ", Distance)
 
-    for i in range(0,LengthA):
-        print(i+1,":") #print("%3d:",i+1)
-        for j in range(0,LengthB):
-            print(From[i][j]) #print("%1d",From[i][j])
-            
+    for i in range(0, LengthA):
+        print(i+1, ": ", end="")
+        for j in range(0, LengthB):
             if(From[i][j] == 0):
-                print("\\")
-                break
+                print("\\", end=" ")
             elif(From[i][j] == 1):
-                print("|")
-                break
+                print("|", end=" ")
             elif(From[i][j] == 2):
-                print("-")
-                break
-            else:
-                break
+                print("-", end=" ")
+        print("")
 
-    print("\n")
     #print("A: %s",ResultA)
     #print("B: %s",ResultB)
-    
-    #DP
 
+    # DP
 
     """
     # 認証処理(時系列をそろえた結果を用いてそれぞれの特徴点ごとに距離を比較)
@@ -229,6 +227,7 @@ def main():
     save_as_csv('outputs/vec_true', old)
     save_as_csv('outputs/vec_challenge', new)
     """
+
 
 if __name__ == "__main__":
     main()
