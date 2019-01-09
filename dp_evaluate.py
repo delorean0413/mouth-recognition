@@ -32,7 +32,7 @@ def visualize_vec(data):
 def main():
     #data = []
     ZurePenalty = 1 #1文字ずれたことへのペナルティ
-    AwazuPenalty = 5 #1文字不一致へのペナルティ
+    AwazuPenalty = 3 #1文字不一致へのペナルティ
     Distance = 0 #2つの文字列の不一致度
     LengthA = 0 #Aの長さ
     LengthB = 0 #Bの長さ
@@ -93,7 +93,7 @@ def main():
     #総当たりで一致の確認
     for i,mA in enumerate(max): #range(0,LengthA)  for(i = 0; i < LengthA; i++)
         #print(i+1)
-        print('i', i)    
+        #print('i', i)    
         
         for j,mI in enumerate(min):   #for(j = 0; j < LengthB; j++) 
             #print('j', j)
@@ -149,13 +149,16 @@ def main():
     LenAB = LengthA + LengthB
     s = LengthA-1
     g = LengthB-1
-
+    #print(LenAB)
+    #print(s)
+    #print(g)
     ResultA = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #char ResultA[128];
     ResultB = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #char ResultB[128];
+    
 
     for k in range(LenAB,0,-1): #for(k = LenAB; i >= 0 && j >= 0; k--)
-        ResultA[k] = max[s]
-        ResultB[k] = min[g]
+        ResultA.append(max[s]) #ResultA[k] = max[s]
+        ResultB.append(min[g]) #ResultB[k] = min[s]
 
         if(From[s][g] == 0):
             s-=1
@@ -177,12 +180,12 @@ def main():
     ResultA[LenAB] = ResultB[LenAB] = '\0'
 
     print("===Matching Result===")
-    print("Difference = %6.1f\n",Distance)
+    print("Difference = ",Distance)
 
     for i in range(0,LengthA):
-        print("%3d:",i+1)
+        print(i+1,":") #print("%3d:",i+1)
         for j in range(0,LengthB):
-            print("%1d",From[i][j])
+            print(From[i][j]) #print("%1d",From[i][j])
             
             if(From[i][j] == 0):
                 print("\\")
@@ -197,8 +200,8 @@ def main():
                 break
 
     print("\n")
-    print("A: %s",ResultA)
-    print("B: %s",ResultB)
+    #print("A: %s",ResultA)
+    #print("B: %s",ResultB)
     
     #DP
 
