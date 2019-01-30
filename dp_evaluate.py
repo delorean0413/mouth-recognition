@@ -78,8 +78,8 @@ def main():
     """
 
     # DPマッチング
-    print("Input StringA", max)
-    print("Input StringB", min)
+    print("Input StringA", max.shape)
+    print("Input StringB", min.shape)
 
     LengthA = len(max)
     LengthB = len(min)
@@ -95,17 +95,29 @@ def main():
         # print(i+1)
         #print('i', i)
         for j, mI in enumerate(min):  # for(j = 0; j < LengthB; j++)
-            #print('j', j)
-            diff = np.linalg.norm(mA-mI) # 距離の定義
-            MissMatch[i][j] = diff
-
+            
+            #diff = np.linalg.norm(mA-mI) # 距離の定義
+            
+            #diff = np.dot(mA.T,mI) / (np.linalg.norm(mA) * np.linalg.norm(mI)) #cos類似度
+            for k in range(0,len(mA)):
+                #print("mA(k):", np.linalg.norm(mA[k]))
+                #print("mI(k):", np.linalg.norm(mI[k]))
+                MissMatch[j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
+            #print("np.dot(mA.T, mI)", np.dot(mA.T, mI))
+            #print("norm*norm",(np.linalg.norm(mA) * np.linalg.norm(mI)))
+            #MissMatch[i][j] = diff
+            
             """
             if(mA == mI):
                 MissMatch[i][j] = 0
             else:
                 MissMatch[i][j] = 1
             """
-
+    #print("mA:",mA.shape)
+    #print("mI:",mI.shape)
+    print("i",i)
+    print("j",j)
+    
     print("\n")
 
     # 各経路点の到達コスト
