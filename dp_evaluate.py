@@ -46,12 +46,12 @@ def main():
     LenAB = 0
 
     # 登録済みデータ
-    old = np.array(load_pickle("sample_updown_1.pickle"))
+    old = np.array(load_pickle("vec_true_5.pickle"))
     # old = np.array([[1,1],[1,1]])#[2,2],[4,4]
     #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
 
     # 認証データ
-    new = np.array(load_pickle("sample_updown_1.pickle"))
+    new = np.array(load_pickle("vec_true_15.pickle"))
     # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
     #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
 
@@ -108,7 +108,7 @@ def main():
                 #print("mI(k):", np.linalg.norm(mI[k]))
                 #MissMatch[j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
                 diff += np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
-           
+            #print("diff/len(mI):",diff/len(mI))
             MissMatch[i][j] = diff / len(mI) #サンプル動作
             
             """
@@ -165,7 +165,7 @@ def main():
             else:
                 Cost[i][j] = dtemp3
                 From[i][j] = 2
-
+    
     Distance = Cost[LengthA-1][LengthB-1]  # DPマッチングの不一致度はこれ。以降は結果観察のための整形手続き
 
     # ゴールからスタートへ逆にたどる
