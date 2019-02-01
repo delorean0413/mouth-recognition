@@ -89,8 +89,8 @@ def main():
     #print(sum(len(v) for v in min))
     Length_elem = sum(len(v) for v in min[0])
     print("length_elem/2",Length_elem/2)
-    #MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #サンプル動作
-    MissMatch = [[[0 for i in range(int(Length_elem/2)+1)] for j in range(LengthB+1)]for k in range(LengthA+1)]
+    MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #サンプル動作
+    #MissMatch = [[[0 for i in range(int(Length_elem/2)+1)] for j in range(LengthB+1)]for k in range(LengthA+1)]
     print(len(MissMatch))
     # print(MissMatch)
 
@@ -101,14 +101,15 @@ def main():
         for j, mI in enumerate(min):  # for(j = 0; j < LengthB; j++)
             
             #diff = np.linalg.norm(mA-mI) # 距離の定義　サンプル動作
-            
+            diff = 0
             #diff = np.dot(mA,mI) / (np.linalg.norm(mA) * np.linalg.norm(mI)) #cos類似度ベースの式（動作はしない）
             for k in range(0,len(mI)): #cos類似度
                 #print("mA(k):", np.linalg.norm(mA[k]))
                 #print("mI(k):", np.linalg.norm(mI[k]))
-                MissMatch[i][j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
+                #MissMatch[j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
+                diff += np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
            
-            #MissMatch[i][j] = diff #サンプル動作
+            MissMatch[i][j] = diff / len(mI) #サンプル動作
             
             """
             if(mA == mI):
@@ -128,7 +129,7 @@ def main():
     # 最短距離経路はどこから来たか 0:斜め 1:i増え 2:j増え
     From = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)]
     # コスト計算
-    Cost[0][0] = MissMatch[0][0][0] * AwazuPenalty
+    Cost[0][0] = MissMatch[0][0] * AwazuPenalty
     From[0][0] = 0
 
     # i側の縁
