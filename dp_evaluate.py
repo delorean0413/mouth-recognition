@@ -51,7 +51,7 @@ def main():
     #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
 
     # 認証データ
-    new = np.array(load_pickle("vec_true_18.pickle"))
+    new = np.array(load_pickle("vec_test_5.pickle"))
     # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
     #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
 
@@ -108,9 +108,9 @@ def main():
                 #print("mI(k):", np.linalg.norm(mI[k]))
                 #MissMatch[j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
                 diff += np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
-            #print("diff/len(mI):",diff/len(mI))
-            MissMatch[i][j] = diff / len(mI) #サンプル動作
-            
+
+            MissMatch[i][j] = diff / len(mI)            # [-1, 1]
+            MissMatch[i][j] = 2 - (MissMatch[i][j] + 1) # [0, 2]
             """
             if(mA == mI):
                 MissMatch[i][j] = 0
