@@ -34,7 +34,7 @@ def visualize_vec(data):
 def main():
     #data = []
     ZurePenalty = 1  # 1文字ずれたことへのペナルティ
-    AwazuPenalty = 5  # 1文字不一致へのペナルティ
+    AwazuPenalty = 3  # 1文字不一致へのペナルティ
     Distance = 0  # 2つの文字列の不一致度
     LengthA = 0  # Aの長さ
     LengthB = 0  # Bの長さ
@@ -92,7 +92,7 @@ def main():
     MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #サンプル動作
     #MissMatch = [[[0 for i in range(int(Length_elem/2)+1)] for j in range(LengthB+1)]for k in range(LengthA+1)]
     print(len(MissMatch))
-    print("min:",len(min[0]))
+    print("min:",min[0])
     # print(MissMatch)
 
     # 総当たりで一致の確認
@@ -108,10 +108,10 @@ def main():
                 #print("mA(k):", np.linalg.norm(mA[k]))
                 #print("mI(k):", np.linalg.norm(mI[k]))
                 #MissMatch[j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
-                #print("test")
                 diff += np.dot(max[i][k],min[j][k]) / (np.linalg.norm(max[i][k]) * np.linalg.norm(min[j][k]))
             #print("diff/len(mI):",diff/len(mI))
             MissMatch[i][j] = diff / len(min[0]) #サンプル動作
+            print("MissMatch :",i,j,":",MissMatch[i][j])
             
             """
             if(mA == mI):

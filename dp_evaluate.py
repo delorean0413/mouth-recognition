@@ -34,7 +34,7 @@ def visualize_vec(data):
 def main():
     #data = []
     ZurePenalty = 1  # 1文字ずれたことへのペナルティ
-    AwazuPenalty = 1  # 1文字不一致へのペナルティ
+    AwazuPenalty = 5  # 1文字不一致へのペナルティ
     Distance = 0  # 2つの文字列の不一致度
     LengthA = 0  # Aの長さ
     LengthB = 0  # Bの長さ
@@ -51,7 +51,7 @@ def main():
     #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
 
     # 認証データ
-    new = np.array(load_pickle("vec_true_15.pickle"))
+    new = np.array(load_pickle("vec_true_18.pickle"))
     # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
     #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
 
