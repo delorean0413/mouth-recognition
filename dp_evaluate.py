@@ -3,6 +3,7 @@ import pickle
 import csv
 import datetime
 import matplotlib.pyplot as plt
+import sys
 
 
 def load_pickle(path):
@@ -32,6 +33,7 @@ def visualize_vec(data):
 
 
 def main():
+    args = sys.argv
     #data = []
     ZurePenalty = 1  # 1文字ずれたことへのペナルティ
     AwazuPenalty = 5  # 1文字不一致へのペナルティ
@@ -51,7 +53,7 @@ def main():
     #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
 
     # 認証データ
-    new = np.array(load_pickle("vec_test_5.pickle"))
+    new = np.array(load_pickle(args[1])) #"vec_test_5.pickle"
     # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
     #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
 
