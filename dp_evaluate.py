@@ -33,8 +33,6 @@ def visualize_vec(data):
 
 
 def main():
-    args = sys.argv
-    #data = []
     ZurePenalty = 1  # 1文字ずれたことへのペナルティ
     AwazuPenalty = 5  # 1文字不一致へのペナルティ
     Distance = 0  # 2つの文字列の不一致度
@@ -48,14 +46,10 @@ def main():
     LenAB = 0
 
     # 登録済みデータ
-    old = np.array(load_pickle("vec_true_5.pickle"))
-    # old = np.array([[1,1],[1,1]])#[2,2],[4,4]
-    #old = np.array([ [[1,1],[1,1]], [[2,2],[2,2]] ])
+    old = np.array(load_pickle(sys.argv[1]))
 
     # 認証データ
-    new = np.array(load_pickle(args[1])) #"vec_test_5.pickle"
-    # new = np.array([[0,0],[1,1],[0,0]])#[0,0],[0,0],[2,2],[4,4]
-    #new = np.array([ [[0,0],[0,0]], [[1,1],[1,1]], [[2,2], [2,2]], [[3,3],[3,3]] ])
+    new = np.array(load_pickle(sys.argv[2]))
 
     # 3次元配列(フレーム数,1フレーム内の特徴点の数,動きベクトルの次元数)
     print("old.shape", old.shape)
@@ -93,8 +87,6 @@ def main():
     print("length_elem/2",Length_elem/2)
     MissMatch = [[0 for i in range(LengthB+1)] for j in range(LengthA+1)] #サンプル動作
     #MissMatch = [[[0 for i in range(int(Length_elem/2)+1)] for j in range(LengthB+1)]for k in range(LengthA+1)]
-    print(len(MissMatch))
-    # print(MissMatch)
 
     # 総当たりで一致の確認
     for i, mA in enumerate(max):  # range(0,LengthA)  for(i = 0; i < LengthA; i++)
@@ -104,12 +96,13 @@ def main():
             
             #diff = np.linalg.norm(mA-mI) # 距離の定義　サンプル動作
             diff = 0
-            #diff = np.dot(mA,mI) / (np.linalg.norm(mA) * np.linalg.norm(mI)) #cos類似度ベースの式（動作はしない）
-            for k in range(0,len(mI)): #cos類似度
+            for k in range(0, np.min([len(mA), len(mI)])):
                 #print("mA(k):", np.linalg.norm(mA[k]))
                 #print("mI(k):", np.linalg.norm(mI[k]))
-                #MissMatch[j][k] = np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
-                diff += np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
+                if np.min([np.linalg.norm(mA[k]), np.linalg.norm(mI[k])]) < 1e-3:
+                    diff += 0
+                else:
+                    diff += np.dot(mA[k],mI[k]) / (np.linalg.norm(mA[k]) * np.linalg.norm(mI[k]))
 
             MissMatch[i][j] = diff / len(mI)            # [-1, 1]
             MissMatch[i][j] = 2 - (MissMatch[i][j] + 1) # [0, 2]
