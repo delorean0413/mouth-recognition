@@ -4,6 +4,7 @@ import time
 import numpy as np
 import threading
 import time
+import datetime
 import pickle
 import sys
 
@@ -38,13 +39,6 @@ def main():
     if video_src.isdigit():
         video_src = int(video_src)
 
-    #videowrite
-    video = []
-    outfile = 'out.avi'
-    fps = 30.0
-    codecs = 'XVID'
-
-    
     # VideoCapture
     cap = cv2.VideoCapture(video_src)
 
@@ -62,7 +56,15 @@ def main():
             break
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-        
+    
+    # Video出力
+    outfile = 'out_{}.avi'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    codecs = 'XVID'
+    height, width, ch = frame.shape
+    fourcc = cv2.VideoWriter_fourcc(*codecs)
+    writer = cv2.VideoWriter(outfile, fourcc, fps, (width, height))
+
     prevPts = []
     for (x, y, w, h) in faces:
         print("detected face:", x, y, w, h)
@@ -85,11 +87,11 @@ def main():
             mx, my, mw, mh = mouth[0]
             mx += x
             my += y
-
+            
             print("detected mouth:", mx, my, mw, mh)
             #特徴点数と配置
-            for y in range(my, my+mh+1, mh//5):
-                for x in range(mx, mx+mw+1, mw//5):
+            for y in range(my, my*6, mh//5): #my+mh+1
+                for x in range(mx, mx*6, mw//5): #mx+mw+1
                     prevPts.extend([[[x, y]]])
 
             #prevPts.extend([[[(mw//2)+mx, my]]])
@@ -119,7 +121,8 @@ def main():
         ret, frame = cap.read()
         if not ret:
             break
-        video.append(frame)
+        
+        writer.write(frame) # 動画書き出し
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
        
         """
@@ -178,14 +181,6 @@ def main():
         if cv2.waitKey(33) & 0xff == ord('q'):
             break
     
-    video = np.asarray(video)
-    frames,height,width,ch = video.shape
-
-    fourcc = cv2.VideoWriter_fourcc(*codecs)
-    writer = cv2.VideoWriter(outfile,fourcc,fps,(width,height))
-    for a in range(frames):
-        writer.write(frame)
-
     writer.release()
     dumper.stop()
     cap.release()
