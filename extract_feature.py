@@ -16,7 +16,7 @@ class DumpTh:
         self.timer.start()
 
     def save(self):
-        with open("vec_challenge.pickle", "wb") as fp:
+        with open("test.pickle", "wb") as fp:
             pickle.dump(self.data, fp)
         self.timer = threading.Timer(self.interval, self.save)
         self.timer.start()
@@ -38,6 +38,13 @@ def main():
     if video_src.isdigit():
         video_src = int(video_src)
 
+    #videowrite
+    video = []
+    outfile = 'out.avi'
+    fps = 30.0
+    codecs = 'XVID'
+
+    
     # VideoCapture
     cap = cv2.VideoCapture(video_src)
 
@@ -55,7 +62,7 @@ def main():
             break
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
+        
     prevPts = []
     for (x, y, w, h) in faces:
         print("detected face:", x, y, w, h)
@@ -107,13 +114,14 @@ def main():
 
     # 保存処理用スレッド
     dumper = DumpTh()
-
+    
     while(cap.isOpened()):
         ret, frame = cap.read()
         if not ret:
             break
-
+        video.append(frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+       
         """
         faces = cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=8)
         for (x, y, w, h) in faces:
@@ -166,10 +174,19 @@ def main():
         # Now update the previous frame and previous points
         pre_gray = gray.copy()
         prevPts = good_new.reshape(-1, 1, 2)
-
+        
         if cv2.waitKey(33) & 0xff == ord('q'):
             break
+    
+    video = np.asarray(video)
+    frames,height,width,ch = video.shape
 
+    fourcc = cv2.VideoWriter_fourcc(*codecs)
+    writer = cv2.VideoWriter(outfile,fourcc,fps,(width,height))
+    for a in range(frames):
+        writer.write(frame)
+
+    writer.release()
     dumper.stop()
     cap.release()
     cv2.destroyAllWindows()
