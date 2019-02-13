@@ -1,5 +1,6 @@
 from scipy import ndimage
 import cv2
+import os
 import time
 import numpy as np
 import threading
@@ -8,16 +9,24 @@ import datetime
 import pickle
 import sys
 
+# 特徴点の数
+N_HORIZONTAL_POINTS = 6 # 横の配置
+N_VERTICAL_POINTS   = 4 # 縦の配置
+
+# 特徴量データの保存ディレクトリ
+SAVE_DIR = "./extracted_features"
 
 class DumpTh:
-    def __init__(self, interval=5):
+    def __init__(self, interval=5, name="test"):
         self.interval = interval
+        self.name = name
         self.data = []
         self.timer = threading.Timer(interval, self.save)
         self.timer.start()
 
     def save(self):
-        with open("test.pickle", "wb") as fp:
+        path = os.path.join(SAVE_DIR, self.name + ".pickle")
+        with open(path, "wb") as fp:
             pickle.dump(self.data, fp)
         self.timer = threading.Timer(self.interval, self.save)
         self.timer.start()
@@ -37,7 +46,11 @@ def main():
 
     video_src = sys.argv[1]
     if video_src.isdigit():
+        # カメラ入力
+        recording_video = True
         video_src = int(video_src)
+    else:
+        recording_video = False
 
     # VideoCapture
     cap = cv2.VideoCapture(video_src)
@@ -58,12 +71,13 @@ def main():
         faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
     
     # Video出力
-    outfile = 'out_{}.avi'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    codecs = 'XVID'
-    height, width, ch = frame.shape
-    fourcc = cv2.VideoWriter_fourcc(*codecs)
-    writer = cv2.VideoWriter(outfile, fourcc, fps, (width, height))
+    if recording_video:
+        outfile = 'out_{}.avi'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        codecs = 'XVID'
+        height, width, ch = frame.shape
+        fourcc = cv2.VideoWriter_fourcc(*codecs)
+        writer = cv2.VideoWriter(outfile, fourcc, fps, (width, height))
 
     prevPts = []
     for (x, y, w, h) in faces:
@@ -85,21 +99,18 @@ def main():
         try:
             # 口部領域を特徴点として追加
             mx, my, mw, mh = mouth[0]
-            mx += x
-            my += y
+            mx += x # 口部の左上x
+            my += y # 口部の左上y
             
             print("detected mouth:", mx, my, mw, mh)
+
             #特徴点数と配置
-            for y in range(my, my*6, mh//5): #my+mh+1
-                for x in range(mx, mx*6, mw//5): #mx+mw+1
-                    prevPts.extend([[[x, y]]])
+            margin_x = mw // N_HORIZONTAL_POINTS
+            margin_y = mh // N_VERTICAL_POINTS
+            for yi in range(0, N_VERTICAL_POINTS):
+                for xi in range(0, N_HORIZONTAL_POINTS):
+                    prevPts.extend([[[mx + xi*margin_x, my + yi*margin_y]]])
 
-            #prevPts.extend([[[(mw//2)+mx, my]]])
-            #prevPts.extend([[[mx, (mh//2)+my]]])
-            #prevPts.extend([[[mx+mw+1, (mh//2)+my]]])
-            #prevPts.extend([[[(mw//2)+mx, my+mh+1]]])
-
-            mouthsize = mouth
         except IndexError:
             pass
 
@@ -115,14 +126,15 @@ def main():
     pre_frame, pre_gray = frame, gray
 
     # 保存処理用スレッド
-    dumper = DumpTh()
+    dumper = DumpTh(name=os.path.basename(video_src).split(".")[0])
     
     while(cap.isOpened()):
         ret, frame = cap.read()
         if not ret:
             break
         
-        writer.write(frame) # 動画書き出し
+        if recording_video:
+            writer.write(frame) # 動画書き出し
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
        
         """
@@ -181,7 +193,8 @@ def main():
         if cv2.waitKey(33) & 0xff == ord('q'):
             break
     
-    writer.release()
+    if recording_video:
+        writer.release()
     dumper.stop()
     cap.release()
     cv2.destroyAllWindows()
