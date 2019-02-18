@@ -54,6 +54,8 @@ def main():
 
     # VideoCapture
     cap = cv2.VideoCapture(video_src)
+    if recording_video:
+        cap.set(cv2.CAP_PROP_FPS, 30)
 
     # カスケード分類器の特徴量を取得する
     cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -72,7 +74,7 @@ def main():
     
     # Video出力
     if recording_video:
-        outfile = 'out_{}.avi'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+        outfile = '{}.avi'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
         fps = cap.get(cv2.CAP_PROP_FPS)
         codecs = 'XVID'
         height, width, ch = frame.shape
@@ -126,7 +128,11 @@ def main():
     pre_frame, pre_gray = frame, gray
 
     # 保存処理用スレッド
-    dumper = DumpTh(name=os.path.basename(video_src).split(".")[0])
+    if recording_video:
+        dump_name = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    else:
+        dump_name = os.path.basename(video_src).split(".")[0]
+    dumper = DumpTh(name=dump_name)
     
     while(cap.isOpened()):
         ret, frame = cap.read()
